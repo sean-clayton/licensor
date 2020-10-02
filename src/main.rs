@@ -5,7 +5,7 @@ use std::io::prelude::*;
 fn main() -> std::io::Result<()> {
     let index = if cfg!(debug_assertions) { 1 } else { 1 };
     let args: Vec<String> = env::args().collect();
-    let id = &args[index].to_uppercase();
+    let id = &args[index];
 
     let license_name = license::from_id(id).unwrap().name();
 
