@@ -12,3 +12,7 @@ jobs:
         with:
           command: build
           args: --release
+      - uses: actions/upload-artifact@v2
+        with:
+          name: licensor-${{ matrix.os }}
+          path: ./target/release/licensor
