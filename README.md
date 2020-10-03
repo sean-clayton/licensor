@@ -4,17 +4,18 @@ A bare minimum cli tool to generate a LICENSE file in the current directory. Mak
 
 ### Example:
 
-- `license Unlicense`
-- `license 0BSD`
+- `licensor Unlicense`
+- `licensor 0BSD`
 
 ### Future Plans
 
 - Add full CLI toolkit
-  - `--help`
-  - `--version`
-  - `--output [FILENAME]`
-  - `--list`
-  - `--header`
+  - `licensor --help` Self-explanatory
+  - `licensor --version` Self-explanatory
+  - `licensor [IDENTIFIER] --output [FILENAME]` Renders the output to a different filename than `LICENSE`
+  - `licensor list` List out all possible IDs.
+  - `licensor [IDENTIFIER] --header` Renders the associated header to stdout
+- Man page. No idea how hard that'll be. Never made one of those before 😅
 - Add piping out to stdout support
 - Improve target breadth
   - macOS versions from one year ago onwards
