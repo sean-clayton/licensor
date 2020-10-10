@@ -1,18 +1,60 @@
-name: build
 on: [push]
+
+name: Release
+
+env:
+  RELEASE_BIN: licensor
+  RELEASE_DIR: artifacts
+
 jobs:
   build-release:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
+        include:
+          - build: linux
+            os: ubuntu-latest
+          - build: macos
+            os: macos-latest
+          - build: windows
+            os: windows-latest
     steps:
       - uses: actions/checkout@v2
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cargo/registry
+          key: ${{ matrix.build }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ matrix.build }}-cargo-registry-
+
       - uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release
-      - uses: actions/upload-artifact@v2
+
+      - name: Create artifact directory
+        run: |
+          mkdir ${{ env.RELEASE_DIR }}
+
+      - name: Move artifact (Windows)
+        if: matrix.build == 'windows'
+        run: |
+          mv ./target/release/${{ env.RELEASE_BIN }}.exe ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}.exe
+
+      - name: Move artifact (Linux)
+        if: matrix.build == 'linux'
+        run: |
+          mv ./target/release/${{ env.RELEASE_BIN }} ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}
+
+      - name: Move artifact (macOS)
+        if: matrix.build == 'macos'
+        run: |
+          mv ./target/release/${{ env.RELEASE_BIN }} ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}
+
+      - name: Upload Binary
+        uses: actions/upload-artifact@v2
         with:
-          name: licensor-${{ matrix.os }}
-          path: ./target/release/licensor
+          name: ${{ matrix.build }}
+          path: ./${{ env.RELEASE_BIN }}
