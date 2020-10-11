@@ -7,11 +7,10 @@ env:
   RELEASE_DIR: artifacts
 
 jobs:
-  strategy:
-    max-parallel: 1
-
   test:
     runs-on: ubuntu-latest
+
+    max-parallel: 1
 
     steps:
       - uses: actions/checkout@v2
@@ -29,6 +28,7 @@ jobs:
 
   build-release:
     runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
