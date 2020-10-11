@@ -1,4 +1,4 @@
-on: [test]
+on: [push]
 
 name: Release
 
@@ -7,6 +7,26 @@ env:
   RELEASE_DIR: artifacts
 
 jobs:
+  strategy:
+    max-parallel: 1
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cargo/registry
+          key: linux-cargo-registry-%{{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            linux-cargo-registry-
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+
   build-release:
     runs-on: ${{ matrix.os }}
     strategy:
