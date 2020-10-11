@@ -1,36 +1,63 @@
 use std::env;
-use std::fs::File;
-use std::io::prelude::*;
+use std::io::{stdout, Error, ErrorKind, Write};
 
 fn main() -> std::io::Result<()> {
-    let index = if cfg!(debug_assertions) { 1 } else { 1 };
     let args: Vec<String> = env::args().collect();
-    let id = &args[index];
+    let id = args.get(1);
 
-    let license_name = license::from_id(id).unwrap().name();
+    return match id {
+        Some(id) => {
+            let license_text = create_contents(id);
 
-    if std::path::Path::new("LICENSE").exists() {
-        println!("LICENSE file already exists. Please remove it to continue.");
-        return Ok(());
-    } else {
-        println!(
-            "Creating LICENSE file with the following license: {}",
-            license_name
-        );
-        create_file(create_contents(id))?;
-        return Ok(());
+            match license_text {
+                Ok(license_text) => return print_license_contents(&mut stdout(), license_text),
+                Err(_) => Err(Error::new(
+                    ErrorKind::InvalidInput,
+                    "Must provide a valid SPDX identifier.",
+                )),
+            }
+        }
+
+        None => {
+            return Err(Error::new(
+                ErrorKind::InvalidInput,
+                "Must provide a valid SPDX identifier.",
+            ))
+        }
+    };
+}
+
+fn print_license_contents(stdout: &mut dyn Write, contents: String) -> std::io::Result<()> {
+    return write!(stdout, "{}", contents);
+}
+
+fn create_contents(id: &str) -> std::result::Result<String, ()> {
+    let license = license::from_id(id);
+
+    match license {
+        Some(license) => {
+            return Ok(String::from(license.text()));
+        }
+
+        None => return Err(()),
     }
 }
 
-fn create_file(contents: String) -> std::io::Result<()> {
-    let mut file = File::create("LICENSE")?;
-    file.write_all(contents.as_bytes())?;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-    Ok(())
-}
+    #[test]
+    fn test_create_contents() {
+        let contents = create_contents(&"MIT");
 
-fn create_contents(id: &str) -> String {
-    let license = license::from_id(id).unwrap();
+        assert!(contents.is_ok())
+    }
 
-    return String::from(license.text());
+    #[test]
+    fn test_print_license_contents() {
+        let mut stdout = Vec::new();
+
+        assert!(print_license_contents(&mut stdout, String::from("sup")).is_ok());
+    }
 }
