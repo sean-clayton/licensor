@@ -7,7 +7,7 @@ fn main() -> std::io::Result<()> {
 
     return match id {
         Some(id) => {
-            let license_text = create_contents(id);
+            let license_text = create_license_text(id);
 
             match license_text {
                 Ok(license_text) => return print_license_contents(&mut stdout(), license_text),
@@ -31,7 +31,7 @@ fn print_license_contents(stdout: &mut dyn Write, contents: String) -> std::io::
     return write!(stdout, "{}", contents);
 }
 
-fn create_contents(id: &str) -> std::result::Result<String, ()> {
+fn create_license_text(id: &str) -> std::result::Result<String, ()> {
     let license = license::from_id(id);
 
     match license {
@@ -49,7 +49,7 @@ mod tests {
 
     #[test]
     fn test_create_contents() {
-        let contents = create_contents(&"MIT");
+        let contents = create_license_text(&"MIT");
 
         assert!(contents.is_ok())
     }
