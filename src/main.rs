@@ -48,16 +48,24 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_create_contents() {
+    fn should_create_valid_contents() {
         let contents = create_license_text(&"MIT");
 
         assert!(contents.is_ok())
     }
 
     #[test]
-    fn test_print_license_contents() {
-        let mut stdout = Vec::new();
+    fn should_error_invalid_contents() {
+        let contents = create_license_text(&"mit");
 
-        assert!(print_license_contents(&mut stdout, String::from("sup")).is_ok());
+        assert!(contents.is_err());
+    }
+
+    #[test]
+    fn should_add_to_stdout() {
+        let mut stdout = Vec::new();
+        print_license_contents(&mut stdout, String::from("sup")).unwrap();
+
+        assert_eq!(stdout, b"sup");
     }
 }
