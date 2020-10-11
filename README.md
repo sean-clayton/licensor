@@ -1,15 +1,21 @@
 # Licensor
 
-A bare minimum cli tool to generate a LICENSE file in the current directory. Make sure you don't already have a `LICENSE` file, and then just give it a valid [SPDX](https://spdx.org/licenses/) identifier and it'll put the license text into LICENSE file. It doesn't use the network to get the license information, it's all bundled in the binary.
+A bare minimum cli tool to print out SPDX licenses to stdout.
 
-### Example:
+### Usage
+
+#### Just print to stdout
 
 - `licensor Unlicense`
 - `licensor 0BSD`
 
+#### Create a LICENSE file
+
+- `licensor Unlicense > LICENSE`
+
 ### Future Plans
 
-- **Default to stdout.** Make full use of the beauty of a cli. `licensor Unlicense > LICENSE`
+- ~~**Default to stdout.** Make full use of the beauty of a cli. `licensor Unlicense > LICENSE`~~
 - Add full CLI toolkit
   - `licensor --help` Self-explanatory
   - `licensor --version` Self-explanatory
@@ -17,7 +23,7 @@ A bare minimum cli tool to generate a LICENSE file in the current directory. Mak
   - `licensor [IDENTIFIER] --header` Renders the associated header to stdout
   - _**Maybe**_ `licensor wizard` which does a questionaire to help you figure out which license you should choose. Depends on how hard this is to do with my limited knowledge of rust 😅
 - Man page. No idea how hard that'll be. Never made one of those before 😅
-- Add piping out to stdout support
+- ~~Add piping out to stdout support~~
 - Improve target breadth
   - macOS versions from one year ago onwards
   - Ubuntu LTS version
