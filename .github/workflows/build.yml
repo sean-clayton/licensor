@@ -64,16 +64,19 @@ jobs:
         if: matrix.build == 'windows'
         run: |
           mv ./target/release/${{ env.RELEASE_BIN }}.exe ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}.exe
+          sha256sum ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}.exe
 
       - name: Move artifact (Linux)
         if: matrix.build == 'linux'
         run: |
           mv ./target/release/${{ env.RELEASE_BIN }} ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}
+          sha256sum ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}
 
       - name: Move artifact (macOS)
         if: matrix.build == 'macos'
         run: |
           mv ./target/release/${{ env.RELEASE_BIN }} ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}
+          sha256sum ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}
 
       - name: Upload Binary
         uses: actions/upload-artifact@v2
