@@ -76,7 +76,7 @@ jobs:
         if: matrix.build == 'macos'
         run: |
           mv ./target/release/${{ env.RELEASE_BIN }} ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}
-          sha256sum ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}
+          shasum -a 256 ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}
 
       - name: Upload Binary
         uses: actions/upload-artifact@v2
