@@ -13,6 +13,13 @@ A bare minimum cli tool to print out SPDX licenses to stdout.
 
 - `licensor Unlicense > LICENSE`
 
+### Non-SPDX Licenses
+
+We have support for non-SPDX licenses.
+The current non-SPDX licenses we support are found in the [`licenses` directory](licenses).
+[Submit a Pull Request](https://github.com/sean-clayton/licensor/pulls) if you wish to add more licenses.
+Please keep the naming convention the same: `LicenseRef-IDENTIFIER`.
+
 ### Future Plans
 
 - ~~**Default to stdout.** Make full use of the beauty of a cli. `licensor Unlicense > LICENSE`~~
