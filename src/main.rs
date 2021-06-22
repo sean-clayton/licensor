@@ -1,11 +1,6 @@
-#![allow(unused)]
+use std::collections::HashMap;
 use std::env;
-use std::fs::File;
-use std::io::prelude::*;
-use std::io::Read;
 use std::io::{stdout, Error, ErrorKind, Write};
-
-const LICENSE_DIRECTORY: &str = "licenses";
 
 fn main() -> std::io::Result<()> {
     let args: Vec<String> = env::args().collect();
@@ -37,8 +32,21 @@ fn print_license_contents(stdout: &mut dyn Write, contents: String) -> std::io::
     return write!(stdout, "{}", contents);
 }
 
+fn build_custom_licenses() -> HashMap<String, &'static [u8]> {
+    let mut custom_licenses = HashMap::<String, &[u8]>::new();
+
+    custom_licenses.insert(
+        "LicenseRef-ACAB-1.0".to_string(),
+        include_bytes!("../licenses/LicenseRef-ACAB-1.0"),
+    );
+
+    custom_licenses
+}
+
 fn license_text(id: &str) -> std::result::Result<String, ()> {
-    return create_custom_license_text(LICENSE_DIRECTORY, id).or(create_license_text(id));
+    let custom_licenses = build_custom_licenses();
+
+    return create_custom_license_text(custom_licenses, id).or(create_license_text(id));
 }
 
 fn create_license_text(id: &str) -> std::result::Result<String, ()> {
@@ -53,17 +61,16 @@ fn create_license_text(id: &str) -> std::result::Result<String, ()> {
     }
 }
 
-fn create_custom_license_text(directory: &str, file_name: &str) -> std::result::Result<String, ()> {
-    let file_path = format!("{}/{}", directory, file_name);
-    match File::open(file_path) {
-        Ok(mut file) => {
-            let mut contents = String::new();
-            file.read_to_string(&mut contents);
-
-            return Ok(contents);
+fn create_custom_license_text(
+    custom_license_map: HashMap<String, &[u8]>,
+    custom_license: &str,
+) -> std::result::Result<String, ()> {
+    match custom_license_map.get(custom_license) {
+        Some(str) => {
+            return Ok(String::from_utf8_lossy(str).to_string());
         }
 
-        Err(_) => Err(()),
+        None => Err(()),
     }
 }
 
@@ -95,7 +102,9 @@ mod tests {
 
     #[test]
     fn should_support_custom_licenses() {
-        let contents = create_custom_license_text(&"test-data/licenses", &"LicenseRef-Test");
+        let mut custom_licenses = HashMap::<String, &[u8]>::new();
+        custom_licenses.insert("LicenseRef-Test".to_string(), b"Test license");
+        let contents = create_custom_license_text(custom_licenses, "LicenseRef-Test");
 
         assert!(contents.is_ok());
         assert!(contents.unwrap() == "Test license")
@@ -103,8 +112,9 @@ mod tests {
 
     #[test]
     fn should_fail_on_non_existant_custom_licenses() {
-        let contents =
-            create_custom_license_text(&"directory does not exist", &"license does not exist");
+        let mut custom_licenses = HashMap::<String, &[u8]>::new();
+        custom_licenses.insert("LicenseRef-Test".to_string(), b"Test license");
+        let contents = create_custom_license_text(custom_licenses, &"license does not exist");
 
         assert!(contents.is_err());
     }
