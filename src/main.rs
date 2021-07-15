@@ -1,6 +1,9 @@
+use include_dir::{include_dir, Dir};
 use std::collections::HashMap;
 use std::env;
 use std::io::{stdout, Error, ErrorKind, Write};
+
+const LICENSE_DIR: Dir = include_dir!("./licenses");
 
 fn main() -> std::io::Result<()> {
     let args: Vec<String> = env::args().collect();
@@ -32,19 +35,18 @@ fn print_license_contents(stdout: &mut dyn Write, contents: String) -> std::io::
     return write!(stdout, "{}", contents);
 }
 
-fn build_custom_licenses() -> HashMap<String, &'static [u8]> {
+fn build_custom_licenses(directory: &'static Dir) -> HashMap<String, &'static [u8]> {
     let mut custom_licenses = HashMap::<String, &[u8]>::new();
 
-    custom_licenses.insert(
-        "LicenseRef-ACAB-1.0".to_string(),
-        include_bytes!("../licenses/LicenseRef-ACAB-1.0"),
-    );
+    for license in directory.files() {
+        custom_licenses.insert(license.path.to_string(), license.contents());
+    }
 
     custom_licenses
 }
 
 fn license_text(id: &str) -> std::result::Result<String, ()> {
-    let custom_licenses = build_custom_licenses();
+    let custom_licenses = build_custom_licenses(&LICENSE_DIR);
 
     return create_custom_license_text(custom_licenses, id).or(create_license_text(id));
 }
@@ -124,5 +126,14 @@ mod tests {
         let contents = license_text(&"LicenseRef-ACAB-1.0");
 
         assert!(contents.is_ok());
+    }
+
+    #[test]
+    fn should_build_custom_licenses() {
+        const DIRECTORY: Dir = include_dir!("./test-data/licenses");
+
+        let license_map = build_custom_licenses(&DIRECTORY);
+
+        assert!(license_map.get("LicenseRef-Test").unwrap() == &"Test license".as_bytes());
     }
 }

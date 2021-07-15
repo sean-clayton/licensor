@@ -9,3 +9,4 @@ license = "Unlicense"
 
 [dependencies]
 license = "1.1.8"
+include_dir = "0.6.1"
